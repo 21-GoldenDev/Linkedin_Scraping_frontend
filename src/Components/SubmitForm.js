@@ -25,7 +25,7 @@ const SubmitForm = () => {
         };
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/employees', formData, {
+            const response = await axios.post('https://linkedin-scraping-backend.onrender.com/employees', formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
