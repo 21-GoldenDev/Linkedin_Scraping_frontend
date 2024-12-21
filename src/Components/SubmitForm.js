@@ -9,13 +9,16 @@ const SubmitForm = () => {
     const [subject, setSubject] = useState('');
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [companyPairs, setCompanyPairs] = useState(
-        Array(5).fill({ companyURL: '', companyType: '' })
+        Array(1).fill({ companyURL: '', companyType: '' })
     );
+
+    const [loading, setLoading] = useState(false);
 
     const companyTypeOptions = ['former', 'current', 'both'];
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
 
         const formData = {
             email,
@@ -25,7 +28,7 @@ const SubmitForm = () => {
         };
 
         try {
-            const response = await axios.post('https://linkedin-scraping-backend.onrender.com/test', formData, {
+            const response = await axios.post('http://127.0.0.1:8000/employees', formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -33,6 +36,8 @@ const SubmitForm = () => {
             console.log('Success:', response.data);
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            setLoading(false); // Set loading to false after submission
         }
 
         console.log('Form Data Submitted:', formData);
@@ -60,7 +65,7 @@ const SubmitForm = () => {
     };
 
     return (
-            
+
         <form onSubmit={handleSubmit}>
             <center><h1>Employee Extraction</h1></center>
             <div className='form-group'>
@@ -87,24 +92,24 @@ const SubmitForm = () => {
 
             <div>
                 <div className='select-countries'>Select Country Codes</div>
-                
+
                 <div className='checkbox-container'>
-                {countries.map((country) => (
-                    <div key={country.code}>
-                        <input
-                            type="checkbox"
-                            id={country.code}
-                            value={country.name}
-                            checked={selectedCountries.includes(country.code)}
-                            onChange={() => handleCheckboxChange(country.code)}
-                        />
-                        <label htmlFor={country.code}>{country.name}</label>
-                    </div>
-                ))}
+                    {countries.map((country) => (
+                        <div key={country.code}>
+                            <input
+                                type="checkbox"
+                                id={country.code}
+                                value={country.name}
+                                checked={selectedCountries.includes(country.code)}
+                                onChange={() => handleCheckboxChange(country.code)}
+                            />
+                            <label htmlFor={country.code}>{country.name}</label>
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {[...Array(5)].map((_, index) => (
+            {[...Array(1)].map((_, index) => (
                 <div key={index} className='company-pair-container'>
                     <div className='input-group'>
                         <label htmlFor={`companyURL-${index}`}>Company URL-{index + 1}</label>
@@ -125,7 +130,7 @@ const SubmitForm = () => {
                             onChange={(e) => handleCompanyChange(index, 'companyType', e.target.value)}
                             required
                         >
-                            <option value="">Select a company type</option>
+                            <option value="">Select a type</option>
                             {companyTypeOptions.map((type) => (
                                 <option key={type} value={type}>
                                     {type}
@@ -137,7 +142,9 @@ const SubmitForm = () => {
             ))}
 
             <div className='button-container'>
-                <button type="submit">Submit</button>
+                <button type="submit" disabled={loading}>
+                    {loading ? <div className="spinner"></div> : 'Submit'}
+                </button>
             </div>
         </form>
     );
